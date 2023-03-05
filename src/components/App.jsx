@@ -25,8 +25,11 @@ class App extends Component {
     if (findName.length !== 0) {
       alert(`${name} is already in contacts.`);
     } else {
-      contacts.push({ id: nanoid(), name, number });
-      this.setState({ contacts });
+      const contact = { id: nanoid(), name, number };
+
+      this.setState(prevState => ({
+        contacts: [...prevState.contacts, contact],
+      }));
     }
   };
 
@@ -50,6 +53,27 @@ class App extends Component {
       ),
     }));
   };
+
+  componentDidMount() {
+    const getLocalStorage = localStorage.getItem('constacts');
+
+    if (getLocalStorage) {
+      try {
+        const state = JSON.parse(getLocalStorage);
+        this.setState({ contacts: state });
+      } catch (error) {
+        alert('Oops! Error: ', error.message);
+      }
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { contacts } = this.state;
+    if (contacts !== prevState.contacts) {
+      console.log(contacts);
+      localStorage.setItem('constacts', JSON.stringify(contacts));
+    }
+  }
 
   render() {
     const { filter } = this.state;
